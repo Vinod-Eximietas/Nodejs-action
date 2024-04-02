@@ -1,8 +1,10 @@
 name: Build and Push Docker Image
 
 on:
-  repository_dispatch:
-    types: ['trigger_build_and_push_image']
+  workflow_run:
+    workflows: ["Authenticate with GCP"]
+    types:
+      -completed
 
 jobs:
   build_and_push_image:
