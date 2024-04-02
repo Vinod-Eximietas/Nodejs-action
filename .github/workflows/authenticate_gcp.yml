@@ -4,10 +4,15 @@ on:
   push:
     branches:
       - main
+# on:
+#   workflow_run:
+#     workflows: ["Python Lint and SonarQube Scan"]
+#     types:
+#      - completed
+
 jobs:
   authenticate:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
