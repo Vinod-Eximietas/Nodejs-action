@@ -1,9 +1,8 @@
 name: Authenticate with GCP
 
 on:
-  push:
-    branches:
-      - main
+  repository_dispatch:
+    types: ['trigger_authentication']
 
 jobs:
   authenticate:
