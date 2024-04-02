@@ -1,29 +1,54 @@
-name: Build and Push Docker Image
+name: Push Docker Image to Artifact Registry
 
 on:
   workflow_run:
     workflows: ["Authenticate with GCP"]
     types:
-      -completed
-
+      - completed
+ 
 jobs:
-  build_and_push_image:
+  push:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_CI_SERVICE_ACCOUNT_KEY }}
+          credentials_json: ${{ secrets.GCP_CI_SERVICE_ACCOUNT_KEY }}
 
-      - name: Authenticate Docker to Artifact Registry
-        run: gcloud auth configure-docker
+      - name: Configure Docker to use gcloud as a credential helper
+        run: |
+          gcloud auth configure-docker \
+          us-central1-docker.pkg.dev
 
+      - name: Check if the repository exists
+        id: check_repo
+        run: |
+          if gcloud artifacts repositories describe ${{ vars.REPOSITORY_NAME }} --location=${{ vars.LOCATION }} >/dev/null 2>&1; then
+            echo "::set-output name=exists::true"
+          else
+            echo "::set-output name=exists::false"
+          fi
+        continue-on-error: true
+      
+      - name: Create the repository if it doesn't exist
+        if: steps.check_repo.outputs.exists == 'false'
+        run: |
+          gcloud artifacts repositories create ${{ vars.REPOSITORY_NAME }} --location=${{ vars.LOCATION }} --repository-format=docker
+      
       - name: Build Docker image
         run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-nodejs-app .
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-nodejs-app
+          gcloud auth configure-docker
+          docker build -t ${{ vars.LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ vars.REPOSITORY_NAME }}/image:tag1 .
+          
+      - name: Push Docker image to Artifact Registry
+        run: |
+          gcloud auth configure-docker
+          docker push ${{ vars.LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ vars.REPOSITORY_NAME }}/image:tag1
+          
+          
