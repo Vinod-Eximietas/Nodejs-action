@@ -18,7 +18,7 @@ RUN npm install --no-cache-dir -g eslint
 COPY package.json package-lock.json /app/
 RUN npm install
 
-# restrict app src permissions to in container User
+# restrict app src permissions to in container user
 RUN chown -R usrid_user:grpid_group /app
 RUN chmod 755 /app
 
