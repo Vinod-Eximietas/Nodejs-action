@@ -1,9 +1,9 @@
 name: Authenticate with GCP
 
 on:
-  repository_dispatch:
-    types: ['trigger_authentication']
-
+  push:
+    branches:
+      - main
 jobs:
   authenticate:
     runs-on: ubuntu-latest
