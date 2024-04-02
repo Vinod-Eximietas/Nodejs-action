@@ -1,9 +1,8 @@
 name: Build and Push Docker Image
 
 on:
-  push:
-    branches:
-      - main
+  repository_dispatch:
+    types: ['trigger_build_and_push_image']
 
 jobs:
   build_and_push_image:
