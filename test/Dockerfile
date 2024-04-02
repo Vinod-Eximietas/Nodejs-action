@@ -9,7 +9,7 @@ RUN groupadd -g 15002 grpid_group && \
     useradd -u 150002 -g grpid_group usrid_user
 
 # Copy the Node.js script into the container
-COPY app.js /app/app.js
+COPY hello.js /app/hello.js
 
 # Install ESLint
 RUN npm install --no-cache-dir -g eslint
@@ -18,7 +18,7 @@ RUN npm install --no-cache-dir -g eslint
 COPY package.json package-lock.json /app/
 RUN npm install
 
-# restrict app src permissions to in container user
+# Restrict app src permissions to in-container user
 RUN chown -R usrid_user:grpid_group /app
 RUN chmod 755 /app
 
