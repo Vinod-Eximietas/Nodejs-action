@@ -26,3 +26,17 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+  trigger_authentication:
+    needs: lint_and_test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Authentication Workflow
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          workflow_id: 'authenticate_gcp.yml'
+          ref: main
