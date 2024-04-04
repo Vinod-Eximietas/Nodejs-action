@@ -39,9 +39,12 @@ jobs:
       - name: Create the repository if it doesn't exist
         if: steps.check_repo.outputs.exists == 'false'
         run: |
-           gcloud auth configure-docker \
-           us-central1-docker.pkg.dev
-           gcloud artifacts repositories create ${{ vars.REPOSITORY_NAME }} --location=${{ vars.LOCATION }} --repository-format=docker
+             gcloud artifacts repositories create gcrrepo \
+             --location=us-central1 \
+             --repository-format=docker
+           # gcloud auth configure-docker \
+           # us-central1-docker.pkg.dev
+           # gcloud artifacts repositories create ${{ vars.REPOSITORY_NAME }} --location=${{ vars.LOCATION }} --repository-format=docker
       
       - name: Build Docker image
         run: |
