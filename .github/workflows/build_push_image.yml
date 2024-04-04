@@ -26,15 +26,11 @@ jobs:
           gcloud auth configure-docker \
           us-central1-docker.pkg.dev
 
-      - name: Check if the repository exists
-        id: check_repo
+      - name: Create the repository if it doesn't exist
+        if: steps.check_repo.outputs.exists == 'false'
         run: |
-          if gcloud artifacts repositories describe ${{ vars.REPOSITORY_NAME }} --location=${{ vars.LOCATION }} >/dev/null 2>&1; then
-            echo "::set-output name=exists::true"
-          else
-            echo "::set-output name=exists::false"
-          fi
-        continue-on-error: true
+          gcloud artifacts repositories create ${{ vars.REPOSITORY_NAME }} --location=${{ vars.LOCATION }} --repository-format=docker
+
       
       - name: Create the repository if it doesn't exist
         if: steps.check_repo.outputs.exists == 'false'
