@@ -2,7 +2,8 @@ name: Authenticate with GCP
 
 on:
   push:
-    paths: ['test/**']
+    branches:
+      - main
 
 jobs:
   authenticate:
